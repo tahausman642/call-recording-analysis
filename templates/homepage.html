@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – CallSense</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-cover bg-center bg-no-repeat font-sans min-h-screen"
+      style="background-image: url('{% static "images/homepage.jpg" %}');">
+
+  <!-- Navbar -->
+  <header class="bg-blue-600 shadow-md">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <h1> <a href="{% url 'homepage' %}"  class="text-2xl font-bold text-white">CallSense </a> </h1>
+      <nav class="space-x-4">
+        <a href="{% url 'myuploads' %}" class="text-white hover:text-gray-200">My Uploads</a>
+        <a href="{% url 'reports' %}" class="text-white hover:text-gray-200">Reports</a>
+        <a href="{% url 'log_in' %}" class="text-white hover:text-gray-200">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content with white background overlay -->
+  <main class="container mx-auto px-6 py-10">
+    <div class="bg-white bg-opacity-90 backdrop-blur-md rounded-lg p-8 shadow-lg">
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome back, {{ user_name }} 👋</h2>
+      <p class="text-gray-600 mb-8">Here's what's happening with your call analysis today:</p>
+
+      <!-- Dashboard Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-700">Total Uploads</h3>
+          <p class="text-3xl text-blue-600 font-bold mt-2">{{ total_uploads }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-700">Reports Generated</h3>
+          <p class="text-3xl text-blue-600 font-bold mt-2">{{ report_count }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-700">Avg. Sentiment Score</h3>
+          <p class="text-3xl text-blue-600 font-bold mt-2">{{ avg_sentiment }}%</p>
+        </div>
+      </div>
+
+      <!-- Upload Section (Modified from your original CTA) -->
+      <div class="bg-white rounded-lg shadow p-8">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Upload New Call Recording</h3>
+        
+        {% if error %}
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+          {{ success }}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_call' %}">
+          {% csrf_token %}
+          
+          <!--<div class="mb-4">
+            <label class="block text-gray-700 mb-2" for="caller_number">
+              Caller Number (Optional)
+            </label>
+            <input type="text" name="caller_number" id="caller_number" 
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        -->
+          <div class="mb-6">
+            <label class="block text-gray-700 mb-2" for="recording">
+              Select Audio File
+            </label>
+            <div class="flex items-center justify-center w-full">
+              <label class="flex flex-col w-full h-32 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  <p class="mb-2 text-sm text-gray-500">Click to upload or drag and drop</p>
+                  <p class="text-xs text-gray-500">MP3, WAV, or (Max 10MB)</p>
+                </div>
+                <input type="file" name="recording" id="recording" accept="audio/*" class="hidden">
+              </label>
+            </div>
+          </div>
+          
+          <button type="submit" 
+                  class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            Upload and Analyze
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white bg-opacity-90 mt-12 py-6 text-center text-gray-600 text-sm">
+    &copy; 2025 CallSense. Empowering better conversations.
+  </footer>
+
+  <script>
+    // Display selected filename
+    document.getElementById('recording').addEventListener('change', function(e) {
+      const fileName = e.target.files[0]?.name || 'No file selected';
+      const label = e.target.previousElementSibling;
+      label.querySelector('p:first-of-type').textContent = fileName;
+    });
+  </script>
+</body>
+</html>
